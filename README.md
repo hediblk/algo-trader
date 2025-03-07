@@ -3,7 +3,7 @@
 - Currently, a random forest classifier is used to predict long entry points based on a 10 year long dataset of AAPL stock. The strategy is based on RSI and EMAs.
 
 # Next steps
-- Implement a backtesting function to evaluate the performance of the bot on unseen data.
+- Implement a backtesting function to evaluate the performance of the bot on unseen data + plot the results.
 - Optimize the hyperparameters of the current classifier using a grid search.
-- Explore other classifiers and strategies.
-- Implement a short entry point classifier.
+- Explore using XGbost and/or other technical analysis indicators to be added to the strategy.
+- Implement a short entry point strategy.

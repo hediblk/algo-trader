@@ -9,14 +9,15 @@ import mplfinance as mpf
 # PERIODS = [1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y, ytd, max]
 
 def get_data(ticker, interval='1d', period='10y'):
-    data = yf.download(ticker, interval=interval, period=period,
-                       rounding=True, multi_level_index=False)
+    data = yf.download(ticker, interval=interval, 
+                       period=period, multi_level_index=False, auto_adjust=True)
     return data
 
 
-def price_chart(df, type='candle', volume=True, style='yahoo', title='AAPL Price chart'):
-    mpf.plot(df.loc['2024-12-01':], type=type,
-             volume=volume, style=style, title=title)
+def price_chart(df, type='line', style='yahoo', 
+                volume=True, title='Price chart'):
+    mpf.plot(df, type=type, volume=volume, 
+             style=style, title=title)
 
     # mpf turns the grid on, we turn it off for future plots
     plt.rcParams['axes.grid'] = False

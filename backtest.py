@@ -2,7 +2,6 @@ from utils import *
 
 import pandas_ta as ta
 from backtesting import Backtest, Strategy
-from backtesting.test import SMA
 from backtesting.lib import crossover
 
 # sample backtest to demonstrate the use of the backtesting library

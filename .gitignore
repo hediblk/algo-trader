@@ -91,10 +91,13 @@ target/
 # Exclude virtual environment
 .venv/
 
-# Exclude trained models
-/models/
 
-# exclude data from source control by default
-# /data/
+# exclude data and reports from source control
+/data/
+/reports/
 
+# HTML reports
 *.html
+
+# Custom Copilot instructions
+instructions.md

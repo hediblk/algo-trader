@@ -6,20 +6,20 @@ import datetime as dt
 from sklearn.preprocessing import MinMaxScaler
 
 from src.config import (
-    WINDOW_SIZES, BOLLINGER_WINDOW, BOLLINGER_STD,
+    MA_WINDOW_SIZES, VOL_WINDOW_SIZES, BOLLINGER_WINDOW, BOLLINGER_STD,
     RSI_WINDOW, MACD_FAST, MACD_SLOW, MACD_SIGNAL,
     PROCESSED_DATA_DIR, NORMALIZED_DATA_DIR
 )
 
 
-def calculate_technical_indicators(data):
+def compute_technical_indicators(data):
     """
     Calculate technical indicators for the given stock data
     """
 
     df = data.copy()
 
-    for window in WINDOW_SIZES:
+    for window in MA_WINDOW_SIZES:
         df[f'ema_{window}'] = ta.ema(df['close'], length=window)
 
     bollinger = ta.bbands(
@@ -59,7 +59,7 @@ def generate_summary_statistics(data):
 
     df['cum_log_return'] = np.exp(df["daily_log_return"].cumsum()) - 1
 
-    for window in [5, 10, 20, 50]:
+    for window in VOL_WINDOW_SIZES:
         df[f'volatility_{window}d'] = df['daily_log_return'].rolling(
             window=window).std()
 
@@ -76,7 +76,7 @@ def create_feature_sets(data, save=False, ticker=None):
     Create comprehensive feature sets for machine learning
     """
 
-    df_technical = calculate_technical_indicators(data)
+    df_technical = compute_technical_indicators(data)
     df_features = generate_summary_statistics(df_technical)
 
     df_features = df_features.dropna()

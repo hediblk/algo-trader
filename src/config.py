@@ -20,7 +20,8 @@ for directory in [RAW_DATA_DIR, NORMALIZED_DATA_DIR, PROCESSED_DATA_DIR, MODELS_
     os.makedirs(directory, exist_ok=True)
 
 
-WINDOW_SIZES = [5, 10, 20, 50, 200] # for ma
+MA_WINDOW_SIZES = [5, 10, 20, 50, 200]
+VOL_WINDOW_SIZES = [5, 10, 20, 50]
 BOLLINGER_WINDOW = 20
 BOLLINGER_STD = 2
 RSI_WINDOW = 14
@@ -43,7 +44,8 @@ def get_config():
             "models": MODELS_DIR
         },
         "features": {
-            "window_sizes": WINDOW_SIZES,
+            "ma_window_sizes": MA_WINDOW_SIZES,
+            "vol_window_sizes": VOL_WINDOW_SIZES,
             "bollinger": {
                 "window": BOLLINGER_WINDOW,
                 "std": BOLLINGER_STD

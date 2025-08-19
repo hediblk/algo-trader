@@ -39,9 +39,10 @@ def plot_price(data, ticker, save=True, normalized=False):
     Y_axis_title = 'Price ($)'
 
     if normalized:
-        y_plot = data['tot_return']
+        y_plot = data['close'] / data['close'].iloc[0]
         y_name = 'Total Return'
         Y_axis_title = 'Total Return'
+    
 
     fig.add_trace(
         go.Scatter(
@@ -87,12 +88,12 @@ def plot_returns(data, ticker, save=False):
     """
     configure_plots()
 
-    if 'log_return' not in data.columns:
-        data['log_return'] = np.log(1 + data['close'].pct_change())
-
     fig, axes = plt.subplots(3, 1, figsize=(12, 15))
 
-    axes[0].plot(data.index, data['log_return'], color='#2856f7', alpha=0.7)
+    data['daily_log_return'] = np.log1p(data['close'].pct_change())
+    data['volatility_20d'] = data['daily_log_return'].rolling(window=20).std()
+
+    axes[0].plot(data.index, data['daily_log_return'], color='#2856f7', alpha=0.7)
     axes[0].set_title(f'{ticker} Log Returns',
                       fontsize=16, fontweight='bold')
     axes[0].set_ylabel('Return (%)', fontsize=14)
@@ -105,7 +106,7 @@ def plot_returns(data, ticker, save=False):
     axes[1].set_ylabel('Volatility', fontsize=14)
     axes[1].grid(True, alpha=0.3)
 
-    sns.histplot(data['log_return'].dropna(),
+    sns.histplot(data['daily_log_return'].dropna(),
                  kde=True, ax=axes[2], color='#2856f7')
     axes[2].set_title(f'{ticker} Return Distribution',
                       fontsize=16, fontweight='bold')
@@ -113,15 +114,15 @@ def plot_returns(data, ticker, save=False):
     axes[2].set_ylabel('Frequency', fontsize=14)
 
     from scipy import stats
-    x = np.linspace(data['log_return'].min(),
-                    data['log_return'].max(), 100)
-    mu, std = stats.norm.fit(data['log_return'].dropna())
+    x = np.linspace(data['daily_log_return'].min(),
+                    data['daily_log_return'].max(), 100)
+    mu, std = stats.norm.fit(data['daily_log_return'].dropna())
     p = stats.norm.pdf(x, mu, std)
     axes[2].plot(x, p * (len(data) * (x[1]-x[0])), 'r--', linewidth=2)
 
     stats_text = (f'Mean: {mu:.4f}\nStd Dev: {std:.4f}\n'
-                  f'Skew: {stats.skew(data["log_return"].dropna()):.4f}\n'
-                  f'Kurtosis: {stats.kurtosis(data["log_return"].dropna()):.4f}')
+                  f'Skew: {stats.skew(data["daily_log_return"].dropna()):.4f}\n'
+                  f'Kurtosis: {stats.kurtosis(data["daily_log_return"].dropna()):.4f}')
     axes[2].text(0.05, 0.95, stats_text, transform=axes[2].transAxes,
                  verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
 
@@ -129,6 +130,8 @@ def plot_returns(data, ticker, save=False):
 
     if save:
         save_figure(fig, f"{ticker}_returns_distribution.png")
+
+    data.drop(columns=['daily_log_return', 'volatility_20d'], inplace=True)
 
     return fig
 

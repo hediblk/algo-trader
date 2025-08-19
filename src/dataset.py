@@ -48,21 +48,6 @@ def download_raw(ticker, interval=DEFAULT_INTERVAL, period=DEFAULT_PERIOD, save=
     return data
 
 
-def compute_returns(data):
-    """
-    Process raw data and prepare it for modeling, save to processed directory
-    """
-
-    data['daily_return'] = data['close'].pct_change()
-    data['log_return'] = np.log1p(data['close'].pct_change())
-    data['tot_return'] = (1 + data['log_return']).cumprod()
-    data['volatility_20d'] = data['log_return'].rolling(window=20).std()
-
-    data = data.dropna()
-
-    return data
-
-
 def get_latest_file(directory, pattern):
     """
     Get the latest file in a directory that matches a pattern

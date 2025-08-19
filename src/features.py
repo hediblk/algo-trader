@@ -13,6 +13,9 @@ from src.config import (
 
 
 def calculate_technical_indicators(data):
+    """
+    Calculate technical indicators for the given stock data
+    """
 
     df = data.copy()
 
@@ -50,13 +53,15 @@ def generate_summary_statistics(data):
 
     df['daily_return'] = df['close'].pct_change()
 
-    df['log_return'] = np.log(df['close'] / df['close'].shift(1))
+    df['daily_log_return'] = np.log1p(df['close'].pct_change())
+
+    df['cum_return'] = (1 + df['daily_return']).cumprod() - 1
+
+    df['cum_log_return'] = np.exp(df["daily_log_return"].cumsum()) - 1
 
     for window in [5, 10, 20, 50]:
-        df[f'volatility_{window}d'] = df['daily_return'].rolling(
+        df[f'volatility_{window}d'] = df['daily_log_return'].rolling(
             window=window).std()
-
-    df['cumulative_return'] = (1 + df['daily_return']).cumprod()
 
     df['volume_change'] = df['volume'].pct_change()
 

@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DEFAULT_TICKERS = ["AAPL", "MSFT", "AMZN", "GOOGL", "META"]
+DEFAULT_TICKER = "AAPL"
 DEFAULT_PERIOD = "10y"
 DEFAULT_INTERVAL = "1d"
 
@@ -31,7 +31,7 @@ MACD_SIGNAL = 9
 
 def get_config():
     return {
-        "tickers": DEFAULT_TICKERS,
+        "ticker": DEFAULT_TICKER,
         "period": DEFAULT_PERIOD,
         "interval": DEFAULT_INTERVAL,
         "paths": {

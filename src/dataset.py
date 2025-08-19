@@ -17,41 +17,35 @@ def get_data(ticker, interval=DEFAULT_INTERVAL, period=DEFAULT_PERIOD):
     return data
 
 
-def download_raw(tickers, interval=DEFAULT_INTERVAL, period=DEFAULT_PERIOD, save=False):
+def download_raw(ticker, interval=DEFAULT_INTERVAL, period=DEFAULT_PERIOD, save=False):
     """
-    Download raw stock data from Yahoo Finance and optionally save to the raw data directory
+    Download raw stock data from Yahoo Finance for a single ticker and optionally save to the raw data directory.
+    Returns a single pandas DataFrame for the given ticker.
     """
-    if isinstance(tickers, str):
-        tickers = [tickers]
+    if not isinstance(ticker, str):
+        raise TypeError("ticker must be a string")
 
-    result = {}
+    print(f"Downloading data for {ticker}...")
+    data = get_data(ticker, interval, period)
 
-    for ticker in tickers:
-        print(f"Downloading data for {ticker}...")
-        data = get_data(ticker, interval, period)
+    if not isinstance(data.index, pd.DatetimeIndex):
+        data.index = pd.to_datetime(data.index)
 
-        #ensure the index is datetime
-        if not isinstance(data.index, pd.DatetimeIndex):
-            data.index = pd.to_datetime(data.index)
+    data.columns = data.columns.str.lower()
 
-        data.columns = data.columns.str.lower()
+    data = data[['open', 'high', 'low', 'close', 'volume']]
 
-        # OHLCV ordering
-        data = data[['open', 'high', 'low', 'close', 'volume']]
+    if save:
+        ticker_dir = os.path.join(RAW_DATA_DIR, ticker)
+        os.makedirs(ticker_dir, exist_ok=True)
 
-        if save:
-            ticker_dir = os.path.join(RAW_DATA_DIR, ticker)
-            os.makedirs(ticker_dir, exist_ok=True)
+        timestamp = dt.datetime.today().strftime("%Y-%m-%d")
+        filename = f"{ticker}_{period}_{timestamp}.csv"
+        filepath = os.path.join(ticker_dir, filename)
+        data.to_csv(filepath)
+        print(f"Saved raw data for {ticker} to {filepath}")
 
-            timestamp = dt.datetime.today().strftime("%Y-%m-%d")
-            filename = f"{ticker}_{period}_{timestamp}.csv"
-            filepath = os.path.join(ticker_dir, filename)
-            data.to_csv(filepath)
-            print(f"Saved raw data for {ticker} to {filepath}")
-
-        result[ticker] = data
-
-    return result
+    return data
 
 
 def compute_returns(data):
